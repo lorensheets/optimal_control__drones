@@ -1,4 +1,5 @@
 var drones = [];
+var target;
 
 function setup() {
   dt = 0.02;
@@ -7,7 +8,8 @@ function setup() {
   W = windowWidth;
   H = windowHeight;
   createCanvas(W, H);
-  let num = 5;
+  let num = 25;
+  target = H/2;
   for (let i = 0; i < num; i++) {
     let offset = W * ((i+1)/(num+1))
     drones.push(new Drone(createVector(offset, random(1)*H-10)));
@@ -24,6 +26,7 @@ function draw() {
   }
 }
 
+
 class Drone {
 
   constructor(pos) {
@@ -31,24 +34,23 @@ class Drone {
     this.vel = createVector(0, 0);
     this.mass = 1.0; // kg
     this.thrust = 0.0; // N
-    this.altitude = 0.0;
-    this.target = H/2;
-    this.KP = 0.15;
-    this.KI = 0.00025;
-    this.KD = 25.0;
+    this.altitude = H - this.pos.y;
+    this.KP = 25.0;
+    this.KI = 0.005;
+    this.KD = 750.0;
     this.integral = 0.0;
-    this.prevError = this.target - this.altitude;
+    this.prevError = target - this.altitude;
   }
 
 
   calcForce() {
-    let error = this.target - this.altitude;
+    let error = target - this.altitude;
     this.integral += error;
     let derivative = error - this.prevError;
     this.prevError = error;
     this.thrust = this.KP * error + this.KI * this.integral + this.KD * derivative;
-    if (this.thrust < 0.0) { this.thrust = 0.0; }
-    if (this.thrust > g.mag()*2) { this.thrust = g.mag()*2}
+    // if (this.thrust < 0.0) { this.thrust = 0.0; }
+    // if (this.thrust > g.mag()*3) { this.thrust = g.mag()*3}
  }
 
   calcAccel() {
